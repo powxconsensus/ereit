@@ -8,7 +8,7 @@ describe("Test Builder", () => {
   let BuilderInstance;
   let AddressPoolInstance;
   let EREITInstance;
-
+  let EREITGoveranceInstance;
   beforeEach(async () => {
     accounts = await ethers.getSigners();
     const AddressPool = await ethers.getContractFactory("AddressPool");
@@ -23,17 +23,28 @@ describe("Test Builder", () => {
     EREITInstance = await EREIT.deploy(AddressPoolInstance.address);
     await EREITInstance.deployed();
 
+    const EREITGoverance = await ethers.getContractFactory("EREITGoverance");
+    EREITGoveranceInstance = await EREITGoverance.deploy(
+      AddressPoolInstance.address
+    );
+    await EREITGoveranceInstance.deployed();
+
     await expect(AddressPoolInstance.setBuilderAddress(BuilderInstance.address))
       .to.eventually.be.fulfilled;
     await expect(
       AddressPoolInstance.setEreitTokenAddress(EREITInstance.address)
     ).to.eventually.be.fulfilled;
+    await expect(
+      AddressPoolInstance.setEreitGovernanceAddress(
+        EREITGoveranceInstance.address
+      )
+    ).to.eventually.be.fulfilled;
 
-    await expect(EREITInstance.mint(accounts[0].address, 100)).to.eventually.be
-      .fulfilled;
+    await expect(EREITGoveranceInstance.mint(accounts[0].address, 100)).to
+      .eventually.be.fulfilled;
 
-    await expect(EREITInstance.mint(accounts[1].address, 1000)).to.eventually.be
-      .fulfilled;
+    await expect(EREITGoveranceInstance.mint(accounts[1].address, 1000)).to
+      .eventually.be.fulfilled;
   });
 
   const getSigner = async (index) => {
@@ -67,7 +78,9 @@ describe("Test Builder", () => {
       ])
     ).to.eventually.be.fulfilled;
 
-    const projects = await BuilderInstance.getAllProjects(accounts[0].address);
+    const projects = await BuilderInstance.getAllProjectsByAddress(
+      accounts[0].address
+    );
     const eStateProject = await ethers.getContractFactory("eStateProject");
     const eStateInstance = await eStateProject.attach(projects[0]);
 

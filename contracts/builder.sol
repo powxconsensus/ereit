@@ -14,6 +14,7 @@ contract Builder {
     mapping(uint256 => builder) public buildermp;
     mapping(address => uint256) public addressmp;
     address addressPool;
+    uint256 public total_project = 0;
 
     constructor(address _addressPool) {
         addressPool = _addressPool;
@@ -45,7 +46,19 @@ contract Builder {
         );
     }
 
-    function getAllProjects(address _address)
+    function getAllProjects() public view returns (address[] memory) {
+        address[] memory projectList = new address[](total_project);
+        uint256 idx = 0;
+        for (uint256 i = 1; i < builder_cnt; i++) {
+            for (uint256 j = 0; j < buildermp[i].projects.length; j++) {
+                projectList[idx] = buildermp[i].projects[j];
+                idx++;
+            }
+        }
+        return projectList;
+    }
+
+    function getAllProjectsByAddress(address _address)
         public
         view
         returns (address[] memory)

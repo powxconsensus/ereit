@@ -7,20 +7,26 @@
 const hre = require("hardhat");
 
 async function main() {
-  const currentTimestampInSeconds = Math.round(Date.now() / 1000);
-  const ONE_YEAR_IN_SECS = 365 * 24 * 60 * 60;
-  const unlockTime = currentTimestampInSeconds + ONE_YEAR_IN_SECS;
+  const AddressPool = await ethers.getContractFactory("AddressPool");
+  AddressPoolInstance = await AddressPool.deploy();
+  await AddressPoolInstance.deployed();
 
-  const lockedAmount = hre.ethers.utils.parseEther("1");
+  const Builder = await ethers.getContractFactory("Builder");
+  BuilderInstance = await Builder.deploy(AddressPoolInstance.address);
+  await BuilderInstance.deployed();
 
-  const Lock = await hre.ethers.getContractFactory("Lock");
-  const lock = await Lock.deploy(unlockTime, { value: lockedAmount });
+  const EREIT = await ethers.getContractFactory("EREIT");
+  EREITInstance = await EREIT.deploy(AddressPoolInstance.address);
+  await EREITInstance.deployed();
 
-  await lock.deployed();
+  await expect(AddressPoolInstance.setBuilderAddress(BuilderInstance.address))
+    .to.eventually.be.fulfilled;
+  await expect(AddressPoolInstance.setEreitTokenAddress(EREITInstance.address))
+    .to.eventually.be.fulfilled;
 
-  console.log(
-    `Lock with 1 ETH and unlock timestamp ${unlockTime} deployed to ${lock.address}`
-  );
+  console.log(`Address Pool deployed at ${AddressPoolInstance.address}`);
+  console.log(`Builder deployed at ${BuilderInstance.address}`);
+  console.log(`EREIT deployed at ${EREITInstance.address}`);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

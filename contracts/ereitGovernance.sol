@@ -10,6 +10,7 @@ import "./ereitToken.sol";
 
 contract EREITGoverance {
     address addressPool;
+    mapping(address => bool) public redeemed;
 
     constructor(address _addressPool) {
         addressPool = _addressPool;
@@ -20,7 +21,9 @@ contract EREITGoverance {
         and that blockchain will be backed by trusted token Ether
     */
 
-    function mint(address to, uint256 amount) public {
-        EREIT(AddressPool(addressPool).getEreitTokenAddress()).mint(to, amount);
+    function mint(address to) public {
+        require(!redeemed[to], "already redeemed");
+        redeemed[to] = true;
+        EREIT(AddressPool(addressPool).getEreitTokenAddress()).mint(to, 100000);
     }
 }

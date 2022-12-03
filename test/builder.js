@@ -40,11 +40,11 @@ describe("Test Builder", () => {
       )
     ).to.eventually.be.fulfilled;
 
-    await expect(EREITGoveranceInstance.mint(accounts[0].address, 100)).to
-      .eventually.be.fulfilled;
+    await expect(EREITGoveranceInstance.mint(accounts[0].address)).to.eventually
+      .be.fulfilled;
 
-    await expect(EREITGoveranceInstance.mint(accounts[1].address, 1000)).to
-      .eventually.be.fulfilled;
+    await expect(EREITGoveranceInstance.mint(accounts[1].address)).to.eventually
+      .be.fulfilled;
   });
 
   const getSigner = async (index) => {

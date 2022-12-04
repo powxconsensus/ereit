@@ -19,14 +19,22 @@ async function main() {
   EREITInstance = await EREIT.deploy(AddressPoolInstance.address);
   await EREITInstance.deployed();
 
-  await expect(AddressPoolInstance.setBuilderAddress(BuilderInstance.address))
-    .to.eventually.be.fulfilled;
-  await expect(AddressPoolInstance.setEreitTokenAddress(EREITInstance.address))
-    .to.eventually.be.fulfilled;
+  const EREITGoverance = await ethers.getContractFactory("EREITGoverance");
+  EREITGoveranceInstance = await EREITGoverance.deploy(
+    AddressPoolInstance.address
+  );
+  await EREITGoveranceInstance.deployed();
+
+  await AddressPoolInstance.setBuilderAddress(BuilderInstance.address);
+  await AddressPoolInstance.setEreitTokenAddress(EREITInstance.address);
+  await AddressPoolInstance.setEreitGovernanceAddress(
+    EREITGoveranceInstance.address
+  );
 
   console.log(`Address Pool deployed at ${AddressPoolInstance.address}`);
   console.log(`Builder deployed at ${BuilderInstance.address}`);
   console.log(`EREIT deployed at ${EREITInstance.address}`);
+  console.log(`EREIT Goverance deployed at ${EREITGoveranceInstance.address}`);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
